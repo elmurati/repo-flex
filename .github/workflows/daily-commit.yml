@@ -1,25 +1,44 @@
-name: Daily Commit
+name: Daily Contributions
 
 on:
   schedule:
-    - cron: '0 0 * * *' # runs every day at midnight
+    - cron: '0 0 * * 1-5'
 
 jobs:
-  daily-commit:
+  make-contribution:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Create new file
-      run: |
-        DATE=$(date +'%Y-%m-%d')
-        echo "Automated commit on $DATE" > daily-commit-$DATE.txt
-    - uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_message: "Automated commit on ${{ env.DATE }}"
-        file_pattern: 'daily-commit-*.txt'
-        branch: daily-contribution
-        base: main
-        # Set the pull request body - replace this with your own content
-        body: "This pull request was created automatically by a GitHub Actions workflow to make a daily contribution."
-        # Set the Git credentials - replace this with your own secrets
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          # Checkout with full commit history
+          fetch-depth: 0
+      - name: Make daily contribution
+        run: |
+          DATE=$(date +'%Y-%m-%d')
+          echo "Automated commit on $DATE" > daily-commit-$DATE.txt
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v7
+        with:
+          author_name: "GitHub Actions"
+          author_email: "actions@github.com"
+          message: "Daily contribution"
+          # Set the files to commit - replace this with your own file paths
+          add: "daily-commit-$DATE.txt"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          branch: daily-contribution
+          # Set the Git credentials - replace this with your own secrets
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Open pull request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          title: "Daily Contribution"
+          commit-message: "Daily contribution"
+          branch: daily-contribution
+          base: main
+          # Set the pull request body - replace this with your own content
+          body: "This pull request was created automatically by a GitHub Actions workflow to make a daily contribution."
+          # Set the Git credentials - replace this with your own secrets
+          token: ${{ secrets.GITHUB_TOKEN }}

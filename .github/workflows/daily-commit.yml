@@ -17,3 +17,9 @@ jobs:
       with:
         commit_message: "Automated commit on ${{ env.DATE }}"
         file_pattern: 'daily-commit-*.txt'
+        branch: daily-contribution
+        base: main
+        # Set the pull request body - replace this with your own content
+        body: "This pull request was created automatically by a GitHub Actions workflow to make a daily contribution."
+        # Set the Git credentials - replace this with your own secrets
+        token: ${{ secrets.GITHUB_TOKEN }}
